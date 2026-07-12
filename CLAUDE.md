@@ -19,6 +19,6 @@ A Node.js tool to scrape and bypass shortlinks (primarily `s.id`, `justpaste.it`
 - `src/providers/`:
   - `kusonime.js`: Decodes Base64 params.
   - `ouo.js`: Bypasses `ouo.io` using HTTP POST with form tokens.
-  - `shrinkpe.js`: Bypasses JavaScript-heavy shortlinks like `shrink.pe`/`tpi.li` using Playwright headless.
+  - `shrinkpe.js`: Bypasses JavaScript-heavy shortlinks like `shrink.pe`/`tpi.li`. Coba ekstrak base64 di dalam token HTML via axios secara langsung dulu untuk efisiensi, fallback ke Playwright headless jika gagal.
   - `justpaste.js`: Scrapes `justpaste.it` paste text and decodes wrapped links.
 - `src/util.js`: Shortlink provider detection and target URL verification.
