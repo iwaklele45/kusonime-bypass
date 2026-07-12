@@ -1,0 +1,15 @@
+{
+  "name": "kusonime-bypass",
+  "version": "1.0.0",
+  "description": "Bypass kusonime shortlinks and print final download URLs",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "playwright": "^1.47.2"
+  }
+}
