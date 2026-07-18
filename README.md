@@ -27,24 +27,31 @@ npx playwright install chromium
 
 ## Cara Penggunaan
 
+Bisa dijalankan dengan atau tanpa URL.
+
+**Mode Interaktif (Direkomendasikan)**
+```bash
+node index.js
+```
+Akan memunculkan prompt untuk memasukkan URL berulang kali tanpa harus me-restart script.
+
+**Mode Single-Run**
 ```bash
 node index.js https://kusonime.com/tensura-s4-batch-sub-indo/
 ```
 
-Tanpa argumen → default ke Tensura S4 Batch.
-
 ### Contoh Output
 
 ```
+=== Kusonime Bypass ===
 Scraping: https://kusonime.com/tensura-s4-batch-sub-indo/
 
 Ditemukan 28 link (3 unik). Memproses...
 
-[360P | GoogleSharer] https://acefile.co/f/...
-[360P | GoogleDrive]  https://drive.usercontent.google.com/...
-[360P | Mega.nz]      https://mega.nz/file/...
-[480P | GoogleSharer] https://acefile.co/f/...
-...
+[Tensura S4 Batch | 360P [GoogleSharer]] https://acefile.co/f/...
+[Tensura S4 Batch | 360P [GoogleDrive]]  https://drive.usercontent.google.com/...
+[Tensura S4 Batch | 360P [Mega.nz]]      https://mega.nz/file/...
+[Tensura S4 Batch | 480P [GoogleSharer]] https://acefile.co/f/...
 
 Selesai.
 ```

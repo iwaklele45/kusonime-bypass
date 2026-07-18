@@ -6,7 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Install dependencies:** `npm install`
 - **Install Playwright browsers:** `npx playwright install chromium`
-- **Run bypass program:** `node index.js [URL]` (defaults to Tensura S4 Batch)
+- **Run bypass program (Interactive):** `node index.js`
+- **Run bypass program (Single URL):** `node index.js [URL]`
 - **Run single URL test:** `node test-single.js [URL]`
 
 ## Architecture & Structure
