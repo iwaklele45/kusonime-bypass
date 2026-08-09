@@ -12,6 +12,7 @@ Alat untuk bypass shortlink download Kusonime dan mencetak direct download URL (
 - Bypass `ouo.io` via POST request
 - Follow redirect shortlink umum (`tinyurl`, `bit.ly`)
 - Dedup otomatis link yang sama
+- Filter resolusi spesifik (`--360`, `--480`, `--720`, `--1080`) atau tampilkan semua secara default
 
 ## Instalasi
 
@@ -31,13 +32,21 @@ Bisa dijalankan dengan atau tanpa URL.
 
 **Mode Interaktif (Direkomendasikan)**
 ```bash
-node index.js
+# Linux / macOS
+./kusonime.cmd
+
+# Windows CMD / PowerShell
+kusonime.cmd
 ```
-Akan memunculkan prompt untuk memasukkan URL berulang kali tanpa harus me-restart script.
+Akan memunculkan prompt untuk memasukkan URL (bisa ditambah opsi `--360`, `--480`, `--720`, `--1080`) berulang kali tanpa harus me-restart script. Bisa juga dijalankan via Node.js langsung: `node index.js`.
 
 **Mode Single-Run**
 ```bash
-node index.js https://kusonime.com/tensura-s4-batch-sub-indo/
+# Semua resolusi (default)
+./kusonime.cmd https://kusonime.com/tensura-s4-batch-sub-indo/
+
+# Filter resolusi tertentu
+./kusonime.cmd --720 --1080 https://kusonime.com/tensura-s4-batch-sub-indo/
 ```
 
 ### Contoh Output

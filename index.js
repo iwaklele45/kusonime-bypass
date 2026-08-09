@@ -7,6 +7,10 @@ const { scrape } = require('./src/scraper');
 const { bypass } = require('./src/bypass');
 const justpaste = require('./src/providers/justpaste');
 
+function link(url) {
+  return `\x1b]8;;${url}\x1b\\${url}\x1b]8;;\x1b\\`;
+}
+
 // ANSI Colors
 const colors = {
   reset: "\x1b[0m",
@@ -19,7 +23,36 @@ const colors = {
   magenta: "\x1b[35m",
 };
 
-async function runBypass(pageUrl) {
+function parseArgs(args) {
+  const flags = new Set();
+  let url = null;
+
+  for (const arg of args) {
+    if (arg.startsWith('--')) {
+      const res = arg.slice(2).toLowerCase();
+      if (['360', '480', '720', '1080'].includes(res)) {
+        flags.add(res);
+      }
+    } else if (!url && (arg.startsWith('http://') || arg.startsWith('https://'))) {
+      url = arg;
+    }
+  }
+
+  return { targetResolutions: flags, url };
+}
+
+function filterByResolution(label, targetResolutions) {
+  if (!targetResolutions || targetResolutions.size === 0) return true;
+  const upperLabel = label.toUpperCase();
+  for (const res of targetResolutions) {
+    if (upperLabel.includes(`${res}P`) || upperLabel.includes(res)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function runBypass(pageUrl, targetResolutions = new Set()) {
   console.log(`\n${colors.bright}${colors.cyan}=== Kusonime Bypass ===${colors.reset}`);
   console.log(`${colors.cyan}Scraping: ${colors.reset}${pageUrl}\n`);
 
@@ -36,22 +69,29 @@ async function runBypass(pageUrl) {
     return;
   }
 
+  // Filter resolution fast-path jika ada flag
+  const filteredLinks = links.filter(({ label }) => filterByResolution(label, targetResolutions));
+
+  if (!filteredLinks.length) {
+    console.log(`${colors.yellow}Tidak ada link matching resolusi ${Array.from(targetResolutions).join(', ')}P.${colors.reset}`);
+    return;
+  }
+
   // Dedup goUrl — kusonime sering pakai shortlink sama untuk banyak tombol
   const seenGoUrls = new Set();
-  const uniqueLinks = links.filter(({ goUrl }) => {
+  const uniqueLinks = filteredLinks.filter(({ goUrl }) => {
     if (seenGoUrls.has(goUrl)) return false;
     seenGoUrls.add(goUrl);
     return true;
   });
 
-  console.log(`${colors.green}Ditemukan ${colors.bright}${links.length}${colors.reset}${colors.green} link (${colors.bright}${uniqueLinks.length}${colors.reset}${colors.green} unik). Memproses...${colors.reset}\n`);
+  console.log(`${colors.green}Ditemukan ${colors.bright}${filteredLinks.length}${colors.reset}${colors.green} link (${colors.bright}${uniqueLinks.length}${colors.reset}${colors.green} unik). Memproses...${colors.reset}\n`);
 
   // Calculate max label length for column alignment
   let maxLabelLen = 0;
   for (const { label } of uniqueLinks) {
     if (label.length > maxLabelLen) maxLabelLen = label.length;
   }
-  // justpaste.it extracted labels might be unknown, but we pad based on known labels + some margin
   maxLabelLen = Math.max(maxLabelLen, 25);
 
   let currentIdx = 0;
@@ -80,15 +120,16 @@ async function runBypass(pageUrl) {
       }
       process.stderr.write('\r\x1b[K');
       
-      for (const { label: jpLabel, url: jpUrl } of extracted) {
+      const filteredExtracted = extracted.filter(({ label: jpLabel }) => filterByResolution(jpLabel, targetResolutions));
+      for (const { label: jpLabel, url: jpUrl } of filteredExtracted) {
         const finalUrl = await bypass(jpUrl);
         const paddedLabel = `[${jpLabel}]`.padEnd(maxLabelLen + 2);
-        console.log(`${colors.green}${paddedLabel}${colors.reset} ${finalUrl}`);
+        console.log(`${colors.green}${paddedLabel}${colors.reset} ${link(finalUrl)}`);
       }
     } else {
       // Sudah final atau shortlink lain
       const paddedLabel = `[${label}]`.padEnd(maxLabelLen + 2);
-      console.log(`${colors.green}${paddedLabel}${colors.reset} ${resolved}`);
+      console.log(`${colors.green}${paddedLabel}${colors.reset} ${link(resolved)}`);
     }
   }
 
@@ -96,7 +137,7 @@ async function runBypass(pageUrl) {
 }
 
 function askUrl(rl) {
-  rl.question(`${colors.bright}Masukkan URL Kusonime (atau 'q' untuk keluar): ${colors.reset}`, async (answer) => {
+  rl.question(`${colors.bright}Masukkan URL Kusonime [opsi: --360 --480 --720 --1080] (atau 'q' untuk keluar): ${colors.reset}`, async (answer) => {
     const input = answer.trim();
     if (input.toLowerCase() === 'q' || input.toLowerCase() === 'exit') {
       rl.close();
@@ -104,7 +145,13 @@ function askUrl(rl) {
     }
 
     if (input) {
-      await runBypass(input);
+      const parts = input.split(/\s+/);
+      const { targetResolutions, url } = parseArgs(parts);
+      if (url) {
+        await runBypass(url, targetResolutions);
+      } else {
+        console.log(`${colors.red}URL tidak valid.${colors.reset}`);
+      }
     }
     
     askUrl(rl);
@@ -112,10 +159,10 @@ function askUrl(rl) {
 }
 
 async function main() {
-  const argUrl = process.argv[2];
+  const { targetResolutions, url } = parseArgs(process.argv.slice(2));
 
-  if (argUrl) {
-    await runBypass(argUrl);
+  if (url) {
+    await runBypass(url, targetResolutions);
   } else {
     const rl = readline.createInterface({
       input: process.stdin,
