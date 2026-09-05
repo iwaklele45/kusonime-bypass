@@ -54,10 +54,10 @@ async function extract(justpasteUrl) {
       node = node.previousSibling;
     }
 
-    // Cari resolusi (360P, 480P, 720P, 1080P) dari parent tag <p> atau <div>
+    // Cari resolusi dari parent tag <p> atau <div>
     let resolution = '';
     const parentText = $(el).closest('p, div').text() || '';
-    const resMatch = parentText.match(/(360P|480P|720P|1080P)/i);
+    const resMatch = parentText.match(/(360P|480P|720P|1080P|3840P)/i);
     if (resMatch) {
       resolution = resMatch[0];
     }

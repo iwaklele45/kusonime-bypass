@@ -16,12 +16,11 @@ async function scrape(pageUrl) {
   const $ = cheerio.load(html);
   const results = [];
 
-  // Each .smokeddlrh block is a batch section
-  $('.smokeddlrh').each((_, section) => {
-    const sectionTitle = $(section).find('.smokettlrh').text().trim();
+  // Kusonime pages use both legacy classes and newer `rh` variants.
+  $('.smokeddlrh, .smokeddl').each((_, section) => {
+    const sectionTitle = $(section).find('.smokettlrh, .smokettl').first().text().trim();
 
-    // Each .smokeurlrh row is a resolution row (360P, 480P, 720P, 1080P)
-    $(section).find('.smokeurlrh').each((_, row) => {
+    $(section).find('.smokeurlrh, .smokeurl').each((_, row) => {
       const resolution = $(row).find('strong').first().text().trim();
       const rowLabel = [sectionTitle, resolution].filter(Boolean).join(' | ');
 

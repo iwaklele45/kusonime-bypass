@@ -30,7 +30,7 @@ function parseArgs(args) {
   for (const arg of args) {
     if (arg.startsWith('--')) {
       const res = arg.slice(2).toLowerCase();
-      if (['360', '480', '720', '1080'].includes(res)) {
+      if (['360', '480', '720', '1080', '3840'].includes(res)) {
         flags.add(res);
       }
     } else if (!url && (arg.startsWith('http://') || arg.startsWith('https://'))) {
@@ -137,7 +137,7 @@ async function runBypass(pageUrl, targetResolutions = new Set()) {
 }
 
 function askUrl(rl) {
-  rl.question(`${colors.bright}Masukkan URL Kusonime [opsi: --360 --480 --720 --1080] (atau 'q' untuk keluar): ${colors.reset}`, async (answer) => {
+  rl.question(`${colors.bright}Masukkan URL Kusonime [opsi: --360 --480 --720 --1080 --3840] (atau 'q' untuk keluar): ${colors.reset}`, async (answer) => {
     const input = answer.trim();
     if (input.toLowerCase() === 'q' || input.toLowerCase() === 'exit') {
       rl.close();
